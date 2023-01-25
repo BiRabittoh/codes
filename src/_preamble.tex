@@ -10,6 +10,7 @@
 \usepackage{enumitem}
 \usepackage{graphicx}
 \usepackage{wrapfig}
+\usepackage{mathtools}
 
 \graphicspath{ {../res} }
 
@@ -21,6 +22,7 @@
 
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
+\newtheorem*{lemma}{Lemma}
 
 \theoremstyle{definition}
 \newtheorem{example}{Example}
@@ -28,11 +30,14 @@
 \theoremstyle{definition}
 \newtheorem*{remark}{Remark}
 
+
 \makeatletter
 \renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
   \hskip -\arraycolsep
   \let\@ifnextchar\new@ifnextchar
   \array{#1}}
 \makeatother
+
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
 \begin{document}

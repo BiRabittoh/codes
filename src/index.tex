@@ -1,13 +1,15 @@
 \maketitle
 
 \
-These short notes  (under construction) are meant for the students of the  {\em Optimization} course, with no background in Linear Algebra. Students can check out, for instance, the Linear Algebra textbook of the Schaum series for further examples and exercises. They should, however be familiar with matrix multiplication and  able to solve linear systems.  The  Gauss elimination method is also  described at the beginning of these notes.
+{\em Coding theory} is a branch of mathematics and computer science that deals with the properties of {\em codes} and their respective fitness for specific applications. One of the key areas of research in coding theory is the study of bounds on the performance of codes: two of the most important bounds in this area are the {\em sphere-packing bound} and the {\em Delsarte bound}. In this brief article, we will take a closer look at these bounds, exploring their key concepts and applications in modern coding theory, in order to show how they can be used to optimize the performance of a code.
 
 
 \section{Introduction}
-Suppose we're trying to build a remote for a DVD player.
+Suppose we're trying to build a remote with 16 keys for a DVD player. The most natural option would be to transmit 4-bit sequences, since there are $2^4=16$ possible sequences (or {\em words}) that can be arranged with 4 bits.
 
-% TODO: fill intro
+However, a problem arises as soon as the situation gets more realistic. If the transmission is not reliable, there is a probability for each bit in the transmission to be received incorrectly; this will lead to a lot of wrong inputs and is thus a flaw of the device.
+
+We could try reducing the error rate by tripling each of the four transmitted bits, so instead of tarnsmitting {\em abcd} we would transmit {\em aaabbbcccddd}, but this leads to another problem: we're using 12 bits! This will exhaust the battery of our remote control much faster.
 
 \begin{definition}[Hamming distance]
 Given two code words $\textbf{w}, \textbf{w}' \in \{0,1\}^n$, the \emph{Hamming distance} between $\textbf{w}$ and $\textbf{w}'$ is the number of bits in which $\textbf{w}$ differs from $\textbf{w}'$:
@@ -148,21 +150,73 @@ In this case, we can be sure that $\textbf{w}''$ was transmitted.
 In most cases, the number $n$ of bits we can transmit and the amount of errors $r$ to be corrected are given; one of the main problems of coding theory (and the main topic of this document) is finding $A(n,d)$, the maximum possible size of a code $\mathcal{C} \subseteq \{0,1\}^n$ with distance $d$.
 
 \subsection{Simple cases}
-For all $n$, we always have $A(n,1) = 2^n$, because any code has distance 1 by definition; of course, this does not allow us to correct any error.
-%TODO: finish this part
-%\begin{array}{l}
-
-%\end{array};
+For all $n$, we always have $A(n,1) = 2^n$, because any code has distance 1 by definition; of course, this does not allow us to correct any error. The same goes for the case of $d=2$, where $A(n,2) = 2^{n-1}$. Unfortunately, for $d >= 3$, things start to get complicated.
 
 \subsection{The sphere-packing bound}
 For any $n$ and $d$, we can use a \emph{volume argument} to obtain a simple upper bound on $A(n, d)$.
 
-Imagina a spherical box filled with prize balls. If you wanted to guess how many balls can fit inside it, you could conclude that the number of balls is bounded above by the volume of the spherical box divided by the volume of a single box.
+Imagine a box filled with balls. If you wanted to guess how many balls can fit inside it, you could conclude that the number of balls is bounded above by the volume of the container divided by the volume of a single ball.
 
-Let's assume that $d = 2r+1$ is odd and fix any code $\mathcal{C}$ of distance $d$. Now, the set $\{0,1\}^n$ represents the spherical box, containing $|\mathcal{C}|$ Hamming balls:
+Let's assume that $d = 2r+1$ is odd and fix any code $\mathcal{C}$ of distance $d$. Now, the set $\{0,1\}^n$ represents the box, containing $|\mathcal{C}|$ Hamming balls. Each ball is defined as the set of all words in $\{0,1\}^n$ with a distance $r$ from a certain word $w \in \mathcal{C}$.
 \begin{equation}
     B(\mathbf{w}, r) := \{\mathbf{w}' \in \{0,1\}^n : d_H(\mathbf{w}, \mathbf{w}') \leq r\}, \mathbf{w} \in \mathcal{C}.
 \end{equation}
 
-\section{The Delsarte Bound}
-test
+So we have $|\mathcal{C}|$ balls of radius $r$ and distance at least $2r+1$ from one another. This means the balls are disjoint, they're not overlapped. The total number of balls (words in $\mathcal{C}$) cannot be larger than the total number of words in $\{0,1\}^n$  divided by the number of words in a single ball.
+
+The number of words at Hamming distance exactly $i$ from any word $w$ is ${n \choose i}$, which implies:
+
+\begin{equation}
+    |B(\mathbf{w}, r)| = 1 + {n \choose 1} + {n \choose 2} + \dots + {n \choose r} = \sum_{i=0}^{r} {n \choose i},
+\end{equation}
+where each iteration of the sum adds the amount of elements of weight $i$.
+
+Finally, as we said before, the total number of elements in $\{0,1\}^n$ is $2^n$. So, we get the following upper bound:
+
+\begin{lemma}[sphere-packing bound]
+    For all n and r,
+
+    \begin{equation}
+        A(n, 2r+1) \leq \floor*{\frac{2^n}{\sum\limits_{i=0}^{r}{n \choose i}}}.
+    \end{equation}
+\end{lemma}
+
+\begin{example}
+    For $n=7$ and $d=3$, we have $r=1$ so:
+    \begin{equation}
+        A(7,3) \leq \floor*{\frac{2^7}{\sum\limits_{i=0}^{1}{7 \choose i}}} = \floor*{\frac{128}{{7 \choose 0} + {7 \choose 1}}} = \floor*{\frac{128}{1 + 7}} = 16.
+    \end{equation}
+\end{example}
+
+\begin{example}
+    For $n=17$ and $d=3$:
+    \begin{equation}
+        A(17,3) \leq \floor*{\frac{2^{17}}{\sum\limits_{i=0}^{1}{17 \choose i}}} = \floor*{\frac{131072}{{17 \choose 0} + {17 \choose 1}}} = \floor*{\frac{131072}{1 + 17}} = 7281.
+    \end{equation}
+\end{example}
+
+\section{The Delsarte bound}
+\begin{theorem}[Delsarte bound]
+    For integers $n$, $i$, $t$ with $0 \leq i$, $t \leq n$, let us put
+
+    \begin{equation}
+        K_t(n,i) = \sum_{j=0}^{min(i,t)}(-1)^j{i \choose j}{n - i \choose t - j}.
+    \end{equation}
+
+    Then, for every $n$ and $d$, $A(n,d)$ is bounded above by the optimum value of the following linear program in variables $x_0, x_1, \ldots, x_n$:
+
+    \begin{equation}
+        \begin{array}{lll}
+            \text{Maximize}   & x_0 + x_1 + \ldots + x_n                       &                  \\
+            \text{subject to} & x_0 = 1                                        &                  \\
+                              & x_i = 0,                                       & i=1,2,\ldots,d-1 \\
+                              & \sum\limits_{i=0}^{n}K_t(n,i) \dot x_i \geq 0, & t=1,2,\ldots,n   \\
+                              & x_0, x_1, \ldots, x_n \geq 0                   &                  \\
+        \end{array}
+    \end{equation}
+\end{theorem}
+
+
+
+%\begin{array}{l}
+%\end{array}
