@@ -99,6 +99,54 @@ At this point, it's clear how this identity holds true:
 \end{equation}
 Which means: the weight of the result obtained from the bit-wise xor operation is the Hamming distance between the two code-words.
 
+\begin{proposition}
+    The number of words with Hamming distance exactly $i$ from a given word $\mathbf{w}$ is ${ n \choose i }$:
+
+    \begin{equation}
+        |\{ \mathbf{w} \in \{0,1\}^n : d_H(\mathbf{w},\mathbf{w}') = i\}| = {n \choose i}\quad \forall \mathbf{w'} \in \{0,1\}^n.
+    \end{equation}
+\end{proposition}
+\begin{example}
+    Suppose we want to count the words which have distance $i=2$ from the word $001$ ($n=3$).
+    
+    \begin{equation}
+        \begin{aligned}
+            \mathbf{w} = 001 \\
+            n = 3 \\
+            i = 2 
+        \end{aligned}
+        \quad
+        \left.\begin{aligned}
+            111\\
+            101\\
+            110
+        \end{aligned}
+        \right\} 3
+        \quad\quad
+        \begin{aligned}
+            \mathbf{w} = 10010 \\
+            n = 5 \\
+            i = 4
+        \end{aligned}
+        \quad
+        \left.\begin{aligned}
+            01100\\
+            11101\\
+            00101\\
+            01011\\
+            01101
+        \end{aligned}
+        \right\} 5
+    \end{equation}
+
+    \begin{equation}
+        {3 \choose 2} = \frac{3!}{2!(3-2)!}=\frac{3!}{2!}=3
+        \quad\quad
+        {5 \choose 4} = \frac{5!}{4!(5-4)!}=\frac{5!}{4!}=5
+    \end{equation}
+
+\end{example}
+
 \begin{definition}[distance of a code]
 In coding theory, any subset $\mathcal{C} \subseteq \{0,1\}^n$ is called a \emph{code}.
 
@@ -149,10 +197,53 @@ In this case, we can be sure that $\textbf{w}''$ was transmitted.
 
 In most cases, the number $n$ of bits we can transmit and the amount of errors $r$ to be corrected are given; one of the main problems of coding theory (and the main topic of this document) is finding $A(n,d)$, the maximum possible size of a code $\mathcal{C} \subseteq \{0,1\}^n$ with distance $d$.
 
-\subsection{Simple cases}
-For all $n$, we always have $A(n,1) = 2^n$, because any code has distance 1 by definition; of course, this does not allow us to correct any error. The same goes for the case of $d=2$, where $A(n,2) = 2^{n-1}$. Unfortunately, for $d >= 3$, things start to get complicated.
+\section{Simple cases}
+\subsection*{$d=1$}
+First of all, any code needs to have distance 1 by definition: otherwise, we would not be able to distinguish between code words. That said, for all $n$, we always have $A(n,1) = 2^n$, which is the number of possible codewords of $n$ bits.
 
-\subsection{The sphere-packing bound}
+\subsection*{$d=2$}
+To get $A(n,2)$ we start by considering a particular code.
+\begin{lemma}
+    The code $\mathcal{C}$, composed by all $n$-bit codewords of even weight, has distance 2.
+\end{lemma}
+\subsubsection*{Proof}
+We need to prove two things:
+\begin{enumerate}
+    \item $\exists (\mathbf{w},\mathbf{w}') : d_H(\mathbf{w},\mathbf{w}')=2\quad\forall \mathbf{w},\mathbf{w}' \in \mathcal{C}$
+    \item $\nexists (\mathbf{w},\mathbf{w}') : d_H(\mathbf{w},\mathbf{w}')=1\quad\forall \mathbf{w},\mathbf{w}' \in \mathcal{C}$
+\end{enumerate}
+
+To prove point 1, we can just take any word $\mathbf{w}\in \mathcal{C}:|\mathbf{w}|\geq 2$. Then, consider the word $\mathbf{w}'$, obtained by replacing two of the 1's in the word with two 0's.
+$\mathbf{w}'$ has even weight, so we have $\mathbf{w}' \in \mathcal{C}$.
+
+As for point 2, we use a proof by contradiction to show how it's impossible for two words in the code to have distance 1.
+
+Let $\mathbf{w},\mathbf{w}' \in \mathcal{C}$ and suppose $d_H(\mathbf{w},\mathbf{w}')=1$. If $\mathbf{w}$ and $\mathbf{w}'$ have Hamming distance 1, they differ in only 1 bit.
+This means that if $\mathbf{w}$ has even weight, $\mathbf{w}'$ has to have odd weight, and viceversa. This is a contradiction to the hypothesis of all words in $\mathcal{C}$ having even weight, so $\mathbf{w}$ and $\mathbf{w}'$ cannot have Hamming distance 1.
+
+Finally, let's find an upper bound for this code.
+\begin{lemma}
+    Fixed $n$, if $ \mathcal{C} \subseteq \{0,1\}^n : |w| \text{ is even } \forall \mathbf{w}\in \mathcal{C}$, then $|\mathcal{C}| \geq 2^{n-1}$.%TODO: should be equal?
+\end{lemma}
+\subsubsection*{Proof}
+We know that the total number of words in a $n$-bit code is $2^n$. We start with a code made up of $(n-1)$-bit words, and consider the code $\mathcal{C} \subseteq \{0,1\}^n$ obtained by applying the following transformation to each word of the code:
+\begin{itemize}
+    \item if the word has an even weight, add a $0$;
+    \item if the word has an odd weight, add a $1$.
+\end{itemize}
+
+We obtained a code $\mathcal{C}$ which is composed by all the codewords with even weight. Furthermore, $|\mathcal{C}| \geq 2^{n-1}$, which was the number of elements in the starting code. %TODO: should be equal?
+
+This is proof that, for any value of $n$, $A(n,2) = 2^{n-1}$.
+
+\subsection*{$d\geq 3$}
+The previous values of $d$ didn't allow for space to correct any errors.
+
+%todo: show that you need 2r+1 distance to correct r errors.
+Unfortunately, for $d >= 3$, things start to get complicated.
+
+\section{The sphere-packing bound}
+
 For any $n$ and $d$, we can use a \emph{volume argument} to obtain a simple upper bound on $A(n, d)$.
 
 Imagine a box filled with balls. If you wanted to guess how many balls can fit inside it, you could conclude that the number of balls is bounded above by the volume of the container divided by the volume of a single ball.
