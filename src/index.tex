@@ -153,7 +153,7 @@ In coding theory, any subset $\mathcal{C} \subseteq \{0,1\}^n$ is called a \emph
 A code $\mathcal{C}$ has \emph{distance} $d$ if:
 
 \begin{equation}
-    d_H(\textbf{w}, \textbf{w}') \geq d \;\; \forall \;\textbf{w}, \textbf{w}' \in \mathcal{C}.
+    d_H(\textbf{w}, \textbf{w}') \geq d \quad \forall \;\textbf{w}, \textbf{w}' \in \mathcal{C}.
 \end{equation}
 
 Lastly, for $n, d \geq 0$, let $A(n,d)$ denote the maximum cardinality of a code $\mathcal{C} \subseteq \{0,1\}^n$ with distance $d$.
@@ -163,6 +163,7 @@ Lastly, for $n, d \geq 0$, let $A(n,d)$ denote the maximum cardinality of a code
 For $n=7$, a valid code of distance $d=3$ could be the set:
 
 \begin{equation}
+\label{sample-code}
 \mathcal{C} =
 \left.
 \begin{cases}
@@ -242,7 +243,7 @@ The previous values of $d$ didn't allow for space to correct any errors.
 %todo: show that you need 2r+1 distance to correct r errors.
 Unfortunately, for $d >= 3$, things start to get complicated.
 
-\section{The sphere-packing bound}
+\subsection{The sphere-packing bound}
 
 For any $n$ and $d$, we can use a \emph{volume argument} to obtain a simple upper bound on $A(n, d)$.
 
@@ -252,6 +253,13 @@ Let's assume that $d = 2r+1$ is odd and fix any code $\mathcal{C}$ of distance $
 \begin{equation}
     B(\mathbf{w}, r) := \{\mathbf{w}' \in \{0,1\}^n : d_H(\mathbf{w}, \mathbf{w}') \leq r\}, \mathbf{w} \in \mathcal{C}.
 \end{equation}
+
+\begin{figure}[ht!]
+    \label{sphere-vis}
+    \centering
+    \fbox{\includegraphics[width=\textwidth]{sphere-packing.png}}
+\caption{A visualization of the sphere-packing bound.}
+\end{figure}
 
 So we have $|\mathcal{C}|$ balls of radius $r$ and distance at least $2r+1$ from one another. This means the balls are disjoint, they're not overlapped. The total number of balls (words in $\mathcal{C}$) cannot be larger than the total number of words in $\{0,1\}^n$  divided by the number of words in a single ball.
 
@@ -293,6 +301,7 @@ Finally, as we said before, the total number of elements in $\{0,1\}^n$ is $2^n$
     \begin{equation}
         K_t(n,i) = \sum_{j=0}^{min(i,t)}(-1)^j{i \choose j}{n - i \choose t - j}.
     \end{equation}
+    where $K_t$ is the \emph{Krawtchouk polynomial} of degree $t$.
 
     Then, for every $n$ and $d$, $A(n,d)$ is bounded above by the optimum value of the following linear program in variables $x_0, x_1, \ldots, x_n$:
 
@@ -307,6 +316,126 @@ Finally, as we said before, the total number of elements in $\{0,1\}^n$ is $2^n$
     \end{equation}
 \end{theorem}
 
+\begin{example}
+    % TODO: insert examplea
+\end{example}
+\subsection{Making sense of these constraints}
+For each code $\mathcal{C} \subseteq \{0,1\}^n$ we associate $\mathbf{\tilde{x}}=(\tilde{x}_1, \tilde{x}_2, \ldots, \tilde{x}_n)$ such that each $\tilde{x}_i$ is a nonnegative real number and $\tilde{x}_1+\tilde{x}_2+\ldots+\tilde{x}_n=|\mathcal{C}|$.
+We need to prove that, if $\mathcal{C}$ has distance $d$, then $\mathbf{\tilde{x}}$ is a feasible solution for Delsarte's linear program.
+The optimal solution of that linear program (the maximum) is greater or equal to the size of any existing code $\mathcal{C}$ with distance $d$. % TODO: rivedere questa cosa???
+Given $\mathcal{C} \subseteq \{0,1\}^n$, we define each $\tilde{x}_i$ as the number of words in $\mathcal{C}$ which have distance $i$, divided by the total number of words in $\mathcal{C}$:
+\begin{equation}
+    \label{xtildei}
+    \tilde{x}_i = \frac{1}{|\mathcal{C}|} | \{ (\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2:d_H(\mathbf{w}, \mathbf{w}')=i\}|, \quad i=0,1, \ldots,n.
+\end{equation}
+We compute $\tilde{x}_i$ by looking at $\mathcal{C}^2$, so we're counting couples of words with a certain distance $i$. A single couple of words cannot have two different distances, so each couple contributes to one and only one of the $\tilde{x}_i$ variables. For this reason, we have $\tilde{x}_1+\tilde{x}_2+\ldots+\tilde{x}_n=|\mathcal{C}|$.
+Furthermore, since every word only has distance 0 from itself, $\tilde{x}_0$ will always be equal to $\frac{|\mathcal{C}|}{|\mathcal{C}|}=1$.
+If our code $\mathcal{C}$ has distance $d$, then every word in it has distance greater or equal than $d$ from other words. That means $\tilde{x}_1, \tilde{x}_2, \ldots, \tilde{x}_{d-1}=0$.
+\begin{example}
+    Let's try computing $\mathbf{\tilde{x}}$ for a simple code.
+    \begin{equation*}
+        \mathcal{C} \; = \{000, 001, 101, 111\} \quad\quad |\mathcal{C}|=4 \quad\quad n=3
+    \end{equation*}
+    \begin{equation*}
+        \begin{array}{l}
+            \tilde{x}_0 = \frac{1}{4}|\{(000,000), (001, 001), (101, 101), (111, 111)\}|=\frac{4}{4}=1 \\\\
+            \tilde{x}_1 = \frac{1}{4}|\{(000,001), (001,000), (001,101), (101, 001), (101, 111), (111, 101)\}|=\frac{6}{4}=\frac{3}{2}\\\\
+            \tilde{x}_2 = \frac{1}{4}|\{(001,111), (111, 001), (000,101), (101, 000)\}|=\frac{4}{4}=1\\\\
+            \tilde{x}_3 = \frac{1}{4}|\{(000,111), (111, 000)\}|=\frac{2}{4}=\frac{1}{2}\\\\
+            \tilde{x}_0 + \tilde{x}_1 + \tilde{x}_2 + \tilde{x}_3 = 1 + \frac{3}{2} + 1 + \frac{1}{2} = 4 = |\mathcal{C}|
+        \end{array}
+    \end{equation*}
+\end{example}
+\subsection{One last constraint}
+Let $\mathcal{C} \subseteq \{0,1\}^n$ be an arbitrary set, and let $\tilde{x}_i$ be defined as above (\ref{xtildei}) for $i=0,1,\ldots,n$ and $t=1,2,\ldots,n$.
+Then,
+\begin{equation}
+    \sum_{i=0}^{n}K_t(n,i) \tilde{x}_i \geq 0.
+\end{equation}
+To prove this, let $I \subseteq \{1,2,\ldots n\}$ be a set of indices and let's define the Hamming distance $d_H^I(\mathbf{w}, \mathbf{w}')$ as the largest number of indices $i \in I$ with $w_i \neq w_i'$:
+\begin{equation}
+    d_H^I(\mathbf{w}, \mathbf{w}') = |\{i \in I : w_i \neq w_i'\}| \quad\forall\; \mathbf{w}, \mathbf{w}' \in \mathcal{C}.
+\end{equation}
+Of course, this is a more general case of our previously defined Hamming distance, obtained when $I = \{1, 2, \ldots, n\}$.
+\begin{example}
+    \begin{equation*}
+        \begin{array}{l}
+            \mathbf{w} \;= (0010011) \\
+            \mathbf{w}' = (1001101) \\\\
+            I = \{1,3,7\} \quad\quad d_H^I(\mathbf{w}, \mathbf{w}') = 2.
+        \end{array}
+    \end{equation*}
+\end{example}
+We can also define a more general weight, as the number of indices $i \in I$ such that $w_i=1$:
+\begin{equation}
+    |\mathbf{w}|_I = |\{i \in I : w_i = 1\}| \quad\forall\;\mathbf{w}\in\mathcal{C}.
+\end{equation}
+\begin{lemma}
+    \label{even-geq-odd}
+    If $I \subseteq \{1,2,\ldots n\}$ is a set of indices and $\mathcal{C} \subseteq \{0,1\}^n$, then the number of ordered couples $(\mathbf{w}, \mathbf{w}') \in \mathcal{C}^2$ with even $d_H^I(\mathbf{w}, \mathbf{w}')$ is at least as large as the number of ordered couples $(\mathbf{w}, \mathbf{w}') \in \mathcal{C}^2$ with odd $d_H^I(\mathbf{w}, \mathbf{w}')$.
+    \begin{proof}
+        First of all, let's prove that any couple of words $\mathbf{w}, \mathbf{w}' \in \mathcal{C}$ has even $d_H$ if $|\mathbf{w}|$ and $|\mathbf{w}'|$ have the same parity.
+        We previously defined $d_H=|\textbf{w} \oplus \textbf{w}'|$. To obtain the weight of the result of the $\oplus$ operation we can also sum the number of 1's in each word and subtract twice the number of positions where both words have 1, $D$ for brevity:
+        
+        \begin{equation}
+            d_H(\mathbf{w}, \mathbf{w}') = |\mathbf{w} \oplus \mathbf{w}'| = |\textbf{w}| + |\textbf{w}'| + 2D,
+        \end{equation}
+        where $D=|\{i \in \{1,2,\ldots,n\}:w_i=w_i'=1\}|$.
+        First of all, $2D$ is even, so it doesn't change the parity of result. That only depends on the weight of $\mathbf{w}$ and $\mathbf{w}'$.
+        Let's call $\mathcal{E}$ the set of all words in $\mathcal{C}$ with even weight and $\mathcal{O}$ the set of all words in $\mathcal{C}$ with odd weight. Of course, $\mathcal{E} \cup \mathcal{O} = \mathcal{C}$.
+        \begin{equation}
+            \mathcal{E} = \{\mathbf{w} \in \mathcal{C} : |\mathbf{w}|\text{ is even}\}, \quad \mathcal{O} = \{\mathbf{w} \in \mathcal{C} : |\mathbf{w}|\text{ is odd}\}.
+        \end{equation}
+        Then:
+        \begin{itemize}
+            \item for $(\mathbf{w}, \mathbf{w}'): \mathbf{w} \in \mathcal{E} \land \mathbf{w}' \in \mathcal{E}$, $d_H(\mathbf{w}, \mathbf{w}')$ is even;
+            \item for $(\mathbf{w}, \mathbf{w}'): \mathbf{w} \in \mathcal{O} \land \mathbf{w}' \in \mathcal{O}$, $d_H(\mathbf{w}, \mathbf{w}')$ is even;
+            \item for $(\mathbf{w}, \mathbf{w}'): \mathbf{w} \in \mathcal{E} \land \mathbf{w}' \in \mathcal{O}$, $d_H(\mathbf{w}, \mathbf{w}')$ is odd;
+            \item for $(\mathbf{w}, \mathbf{w}'): \mathbf{w} \in \mathcal{O} \land \mathbf{w}' \in \mathcal{E}$, $d_H(\mathbf{w}, \mathbf{w}')$ is odd.
+        \end{itemize}
+        So we can conclude that any couple of words $\mathbf{w}, \mathbf{w}' \in \mathcal{C}$ has even $d_H$ if $|\mathbf{w}|$ and $|\mathbf{w}'|$ have the same parity.
+        That said, the couples of words with even distance are the ones obtained by the cartesian products $\mathcal{E} \times \mathcal{E}=\mathcal{E}^2$ and $\mathcal{O} \times \mathcal{O}=\mathcal{O}^2$; furthermore, the couples of words with odd distance are the ones obtained by the cartesian products $\mathcal{E} \times \mathcal{O}$ and $\mathcal{O} \times \mathcal{E}$.
+        If we want to write our original thesis in these terms, we get the following form, which is clearly always true:
+        \begin{equation}
+            \begin{array}{l}
+                |\mathcal{E}|^2+|\mathcal{O}|^2\geq |\mathcal{E}|\cdot|\mathcal{O}| + |\mathcal{O}|\cdot|\mathcal{E}|;\\\\
+                |\mathcal{E}|^2+|\mathcal{O}|^2\geq 2\cdot|\mathcal{E}|\cdot|\mathcal{O}|;\\\\
+                |\mathcal{E}|^2+|\mathcal{O}|^2 - 2\cdot|\mathcal{E}|\cdot|\mathcal{O}|\geq 0; \\\\
+                (|\mathcal{E}| - |\mathcal{O}|)^2 \geq 0.
+            \end{array}
+        \end{equation}
+    \end{proof}
+\end{lemma}
+\begin{lemma}
+    For every $\mathcal{C} \subseteq \{0,1\}^n$ and every $\mathbf{v}\in\{0,1\}^n$ we have
+    \begin{equation}
+        \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}(-1)^{(\textbf{w} \oplus \textbf{w}')^T\mathbf{v}} \geq 0.
+    \end{equation}
+    \begin{proof}
+        In lemma \ref{even-geq-odd}, we proved that the number of couples of even distance is at least as large as the number of couples of odd distance. This means that their difference must be greater or equal to zero:
+        \begin{equation}
+            \label{evens-odd-geq-zero}
+            \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}(-1)^{d_H^I(\mathbf{w}, \mathbf{w}')} \geq 0.
+        \end{equation}
+        If we set $I=\{i:v_i=1\}$, then $d_H^I(\mathbf{w}, \mathbf{w}') = (\textbf{w} \oplus \textbf{w}')^T\mathbf{v}$: transposing and doing a scalar product with the vector $\mathbf{v}$ gives the same result as computing the Hamming distance on all indices $i\in I$.
+        \begin{example}
+            Suppose $\mathbf{w}=(10010)$ and $\mathbf{w}'=(00111)$ with $\mathbf{v}=(10011)$.
+            Then, $I = \{1,4,5\}$. Let's show that $(\textbf{w} \oplus \textbf{w}')^T\mathbf{v} = d_H^I(\mathbf{w}, \mathbf{w}') = 2$:
+            \begin{equation*}
+                [(10010) \oplus (00111)]^T \cdot (10011) = (10101)^T \cdot (10011) = 1+0+0+0+1 = 2.
+            \end{equation*}
+        \end{example}
+        We can now go back to (\ref{evens-odd-geq-zero}) and replace the distance:
+        \begin{equation}
+            \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}(-1)^{d_H^I(\mathbf{w}, \mathbf{w}')} \geq 0
+            =
+            \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}(-1)^{(\textbf{w} \oplus \textbf{w}')^T\mathbf{v}} \geq 0.
+        \end{equation}
+    \end{proof}
+    \begin{proof}[Proof (algebraic)]
+        %TODO: fill this
+    \end{proof}
+\end{lemma}
 
 
 %\begin{array}{l}
