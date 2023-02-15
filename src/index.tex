@@ -310,7 +310,7 @@ Finally, as we said before, the total number of elements in $\{0,1\}^n$ is $2^n$
             \text{Maximize}   & x_0 + x_1 + \ldots + x_n                       &                  \\
             \text{subject to} & x_0 = 1                                        &                  \\
                               & x_i = 0,                                       & i=1,2,\ldots,d-1 \\
-                              & \sum\limits_{i=0}^{n}K_t(n,i) \dot x_i \geq 0, & t=1,2,\ldots,n   \\
+                              & \sum\limits_{i=0}^{n}K_t(n,i) \cdot x_i \geq 0, & t=1,2,\ldots,n   \\
                               & x_0, x_1, \ldots, x_n \geq 0                   &                  \\
         \end{array}
     \end{equation}
@@ -409,6 +409,7 @@ We can also define a more general weight, as the number of indices $i \in I$ suc
 \begin{lemma}
     For every $\mathcal{C} \subseteq \{0,1\}^n$ and every $\mathbf{v}\in\{0,1\}^n$ we have
     \begin{equation}
+        \label{sum-almost-here}
         \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}(-1)^{(\textbf{w} \oplus \textbf{w}')^T\mathbf{v}} \geq 0.
     \end{equation}
     \begin{proof}
@@ -437,6 +438,49 @@ We can also define a more general weight, as the number of indices $i \in I$ suc
     \end{proof}
 \end{lemma}
 
+\begin{lemma}
+    Now, the only thing left to prove is $\sum_{i=0}^{n}K_t(n,i)\tilde{x}_i\geq 0 \forall t\in\{1,2,\ldots,n\}$.
 
-%\begin{array}{l}
-%\end{array}
+    \begin{proof}
+        We start by summing the inequality in (\ref{sum-almost-here}) over all $\mathbf{v}\in \{0,1\}^n$ of weight $t$:
+        \begin{equation}
+            \sum_{\mathbf{v}\in \{0,1\}^n:|\mathbf{v}|=t}\;\sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}(-1)^{(\textbf{w} \oplus \textbf{w}')^T\mathbf{v}} \geq 0;
+        \end{equation}
+        then, we interchange the summation order:
+        \begin{equation}
+            \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}\;\sum_{\mathbf{v}\in \{0,1\}^n:|\mathbf{v}|=t}(-1)^{(\textbf{w} \oplus \textbf{w}')^T\mathbf{v}} \geq 0.
+        \end{equation}
+
+        At this point, let us fix $\mathbf{u} = \textbf{w} \oplus \textbf{w}'$ and re-write our first inequality as:
+        \begin{equation}
+            \label{s-u-inequality}
+            \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}S(\mathbf{u}) \geq 0,
+        \end{equation}
+        where:
+        \begin{equation}
+            S(\mathbf{u})=\sum_{\mathbf{v}\in \{0,1\}^n:|\mathbf{v}|=t}(-1)^{\mathbf{u}^T\mathbf{v}}.
+        \end{equation}
+        
+
+        In the sum Of $S(\mathbf{u})$, the $\mathbf{v}$ with $\mathbf{u}^T\mathbf{v}=j$ are counted with sign $(-1)^j$. We can count the number of vectors $\mathbf{v}$ of weight $t$ and with $\mathbf{u}^T\mathbf{v}=j$.
+
+        By definition, $|\mathbf{u}|=d_H(\mathbf{w}, \mathbf{w}')$ is the number of 1's in $\mathbf{u}$. To obtain a valid vector $\mathbf{v}$, we need to put $j$ 1's in positions where $\mathbf{u}$ has 0's.
+        Hence, the number of these $\mathbf{v}$ is ${i \choose j}{n-i \choose t-j}$. Then,
+
+        \begin{equation}
+            S(\mathbf{u})=\sum_{j=0}^{\min(i,t)}(-1)^j{i \choose j}{n-i \choose t-j},
+        \end{equation}
+        which is the Krawtchouk polynomial of degree $t$: $K_t(n,i)$.
+        
+        We can now go back to (\ref{s-u-inequality}), which becomes:
+        \begin{equation}
+            \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}S(\mathbf{u}) = \sum_{(\mathbf{w}, \mathbf{w}')\in\mathcal{C}^2}K_t(n,d_H(\mathbf{w}, \mathbf{w}')) \geq 0.
+        \end{equation}
+        For each $i$, $K_t(n,i)$ appears in this sum $|\mathcal{C}|\cdot \tilde{x}_i$ times, because each $\tilde{x}_i$ is the number of couples $(\mathbf{w}, \mathbf{w}')$ with distance $i$. 
+
+        We obtain the thesis by changing the summation to reflect our $\tilde{x}_i$ variables:
+        \begin{equation}
+            \sum_{i=0}^{n}K_t(n,i)\cdot\tilde{x}_i \geq 0.
+        \end{equation}
+    \end{proof}
+\end{lemma}
