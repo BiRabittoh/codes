@@ -240,8 +240,8 @@ This is proof that, for any value of $n$, $A(n,2) = 2^{n-1}$.
 \subsection*{$d\geq 3$}
 The previous values of $d$ didn't allow for space to correct any errors.
 
-%todo: show that you need 2r+1 distance to correct r errors.
-Unfortunately, for $d >= 3$, things start to get complicated.
+%TODO: show that you need 2r+1 distance to correct r errors.
+Unfortunately, for $d \geq 3$, things start to get complicated.
 
 \subsection{The sphere-packing bound}
 
@@ -316,9 +316,6 @@ Finally, as we said before, the total number of elements in $\{0,1\}^n$ is $2^n$
     \end{equation}
 \end{theorem}
 
-\begin{example}
-    % TODO: insert examples
-\end{example}
 \subsection{Making sense of these constraints}
 For each code $\mathcal{C} \subseteq \{0,1\}^n$ we associate $\mathbf{\tilde{x}}=(\tilde{x}_1, \tilde{x}_2, \ldots, \tilde{x}_n)$ such that each $\tilde{x}_i$ is a nonnegative real number and $\tilde{x}_1+\tilde{x}_2+\ldots+\tilde{x}_n=|\mathcal{C}|$.
 We need to prove that, if $\mathcal{C}$ has distance $d$, then $\mathbf{\tilde{x}}$ is a feasible solution for Delsarte's linear program.
@@ -407,6 +404,7 @@ We can also define a more general weight, as the number of indices $i \in I$ suc
     \end{proof}
 \end{lemma}
 \begin{lemma}
+    \label{sum-greater-zero-lemma}
     For every $\mathcal{C} \subseteq \{0,1\}^n$ and every $\mathbf{v}\in\{0,1\}^n$ we have
     \begin{equation}
         \label{sum-almost-here}
@@ -431,13 +429,41 @@ We can also define a more general weight, as the number of indices $i \in I$ suc
         Suppose $\mathbf{w}=(10010)$ and $\mathbf{w}'=(00111)$ with $\mathbf{v}=(10011)$.
         Then, $I = \{1,4,5\}$. Let's show that $(\textbf{w} \oplus \textbf{w}')^T\mathbf{v} = d_H^I(\mathbf{w}, \mathbf{w}') = 2$:
         \begin{equation*}
-            [(10010) \oplus (00111)]^T \cdot (10011) = (10101)^T \cdot (10011) = 1+0+0+0+1 = 2.
+            \begin{array}{ll}
+                (\textbf{w} \oplus \textbf{w}')^T\mathbf{v} & = [(10010) \oplus (00111)]^T \cdot (10011) \\
+                 & = (10101)^T \cdot (10011) \\
+                 & = 1+0+0+0+1 \\
+                 & = 2 = d_H^I(\mathbf{w}, \mathbf{w}').
+            \end{array}
         \end{equation*}
     \end{example}
         
-    
+    There is also another alternative proof for Lemma \ref{sum-greater-zero-lemma}:
     \begin{proof}[Proof (algebraic)]
-        %TODO: fill this
+        First of all, the results of $(\mathbf{w}\oplus\mathbf{w}')^T\mathbf{v}$ and $(\mathbf{w}+\mathbf{w}')^T\mathbf{v}$ have the same parity (the ``modulo 2" operation does not affect parity).
+        
+        Since we're only interested in its parity, we can elevate $-1$ to any of these two and it would give the same result.
+        \begin{equation*}
+            \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{(\mathbf{w}\oplus\mathbf{w}')^T\mathbf{v}} = \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{(\mathbf{w}+\mathbf{w}')^T\mathbf{v}}.
+        \end{equation*}
+
+        At this point, we can use the distributive property over addiction of the scalar product to write:
+        \begin{equation*}
+            \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{(\mathbf{w}+\mathbf{w}')^T\mathbf{v}} =
+            \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{\mathbf{w}^T\mathbf{v}+\mathbf{w}'^T\mathbf{v}}.
+        \end{equation*}
+
+        Now, we can split the exponential:
+        \begin{equation*}
+            \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{\mathbf{w}^T\mathbf{v}+\mathbf{w}'^T\mathbf{v}} =
+            \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{\mathbf{w}^T\mathbf{v}}\cdot (-1)^{\mathbf{w}'^T\mathbf{v}}.
+        \end{equation*}
+
+        We just obtained the definition of the square of a generic polynomial:
+        \begin{equation*}
+            \sum\limits_{(\mathbf{w},\mathbf{w}')\in\mathcal{C}^2}(-1)^{\mathbf{w}^T\mathbf{v}}\cdot (-1)^{\mathbf{w}'^T\mathbf{v}} = \left(\sum\limits_{\mathbf{w}\in\mathcal{C}}(-1)^{\mathbf{w}^T\mathbf{v}}\right)^2 \geq 0,
+        \end{equation*}
+        which is always greater or equal to zero by definition.
     \end{proof}
 \end{lemma}
 
